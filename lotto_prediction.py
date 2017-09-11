@@ -80,7 +80,7 @@ if __name__ == "__main__":
     learning_rate = 0.001
     training_epoch = 20
     batch_size = 100
-    data_size = 539
+    data_size = 541
     keep_prob_number = 0.7
 
     # input place holders
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
 #prediction
     b = []
-    for i in range(3000):
+    for i in range(30000):
         a = make_number2()
         b.append(a)
         lst = []
