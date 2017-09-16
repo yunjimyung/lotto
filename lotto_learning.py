@@ -20,7 +20,7 @@ y_dataset = xy[:,-2:]
 
 #set pramater
 learning_rate = 0.001
-training_epoch = 200
+training_epoch = 20
 batch_size = 100
 data_size = 539
 keep_prob_number = 0.7
@@ -33,7 +33,7 @@ keep_prob = tf.placeholder(tf.float32)
 
 #convolution neural network
 # L1 ImgIn shape=(?, 7, 7, 1)
-W1 = tf.Variable(tf.random_normal([3, 3, 1, 32], stddev=0.01))
+W1 = tf.Variable(tf.random_normal([3, 3, 1, 16], stddev=0.01))
 #    Conv     -> (?, 7, 7, 32)
 #    Pool     -> (?, 4, 4, 32)
 L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
@@ -48,7 +48,7 @@ Tensor("MaxPool:0", shape=(?, 14, 14, 32), dtype=float32)
 '''
 
 # L2 ImgIn shape=(?, 4, 4, 32)
-W2 = tf.Variable(tf.random_normal([3, 3, 32, 64], stddev=0.01))
+W2 = tf.Variable(tf.random_normal([3, 3, 16, 32], stddev=0.01))
 #    Conv      ->(?, 4, 4, 64)
 #    Pool      ->(?, 4, 4, 64)
 L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
@@ -56,10 +56,10 @@ L2 = tf.nn.relu(L2)
 L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1],
                     strides=[1, 2, 2, 1], padding='SAME')
 L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
-L2_flat = tf.reshape(L2, [-1, 2 * 2 * 64])
+L2_flat = tf.reshape(L2, [-1, 2 * 2 * 32])
 
 # Final FC 2x2x64 inputs -> 10 outputs
-W3 = tf.get_variable("W3", shape=[2 * 2 * 64, 2],
+W3 = tf.get_variable("W3", shape=[2 * 2 * 32, 2],
                      initializer=tf.contrib.layers.xavier_initializer())
 b = tf.Variable(tf.random_normal([2]))
 logits = tf.matmul(L2_flat, W3) + b
@@ -76,6 +76,8 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
+count_epoch=[]
+cost_value = []
 # train model
 print('Learning started. It takes sometime.')
 for epoch in range(training_epoch):
@@ -91,10 +93,13 @@ for epoch in range(training_epoch):
         avg_cost += c / total_batch
 
 #print result 2
-#    if epoch % 10 == 0:
-        print('Epoch:', '%04d'%(epoch + 1), 'Cost:', '{:.9f}'.format(avg_cost))
-        with open('./save/result.txt','a') as f:
-           f.write("\nEpoch: %d  Cost: %f" %(epoch + 1, avg_cost))
+#   if epoch % 10 == 0:
+    print('Epoch:', '%04d'%(epoch + 1), 'Cost:', '{:.9f}'.format(avg_cost))
+    cost_value.append(avg_cost)
+    count_epoch.append(epoch)
+#        with open('./save/result.txt','a') as f:
+
+#           f.write("\nEpoch: %d  Cost: %f" %(epoch + 1, avg_cost))
 print("Learning finished")
 
 # Test model and check accuracy
@@ -115,20 +120,14 @@ save_path = saver.save(sess, './save/training')
 x = prediction_testset.astype(np.int64)
 x = x.reshape(1,67)
 y = y_testset.reshape(1,67)
-
-with open('./Data/result.txt','a') as f:
+with open('./save/result.txt','a') as f:
    f.write('\n\ntestdata = ')
    f.write('\n%s'%str(y))
    f.write('\n\nprediction = ')
    f.write('\n%s'%str(x))
    f.write('\n\ntestdata - prediction = ')
    f.write('\n%s'%str(y-x))
-
-   #plot graph
-   import matplotlib
-   matplotlib.use('TkAgg')
-   import matplotlib.pyplot as plt
-   plt.plot(count_epoch, rmse_dataset, 'g-')
-   plt.plot(count_epoch, rmse_testset, 'r-')
-   plt.show()
 '''
+import matplotlib.pyplot as plt
+plt.plot(count_epoch, cost_value, 'g-')
+plt.show()

@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
 #prediction
     b = []
-    for i in range(30000):
+    for i in range(200):
         a = make_number2()
         b.append(a)
         lst = []
@@ -157,7 +157,10 @@ if __name__ == "__main__":
     rmse_error = np.sqrt(np.square(np.mean(test_error,0)-result_error))
 
     number = np.argmin(rmse_error,0)[0]
-    print(np.argmin(rmse_error,0))
+    result_number = c[number,:]
+#    print(np.argmin(rmse_error,0))
     print(number)
-    print(c[number,:])
+    print(result_number)
+    with open('./save/result.txt','a') as f:
+       f.write('\n%s  %s'%(time_now, str(result_number)))
     os.remove('./lotto_resultdata.csv')
