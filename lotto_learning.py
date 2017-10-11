@@ -22,7 +22,7 @@ y_dataset = xy[:,-2:]
 learning_rate = 0.001
 training_epoch = 20
 batch_size = 100
-data_size = 539
+data_size = 545
 keep_prob_number = 0.7
 
 # input place holders
