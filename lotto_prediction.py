@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
 #prediction
     b = []
-    for i in range(500):
+    for i in range(1000):
         a = make_number2()
         b.append(a)
         lst = []
